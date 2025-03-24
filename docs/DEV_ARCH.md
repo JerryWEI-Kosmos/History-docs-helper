@@ -10,9 +10,15 @@
 └── 用户交互层
 ```
 
+核心交互逻辑
+
+![交互流程1](../../../MarkdownNotes/TyporaCloudNotes/img/交互流程1.png)
+
 ## 二、核心模块细化设计
 
 ### 1. OCR智能处理模块
+
+![ocr数据流](../../../MarkdownNotes/TyporaCloudNotes/img/ocr数据流.png)
 
 ```txt
 OCR模块
@@ -30,25 +36,7 @@ OCR模块
     └── 断句补全子系统
 ```
 
-### 2. 数据流转中枢模块
-
-```txt
-数据管道
-├── 格式转换引擎
-│   ├── OCR→结构体转换器
-│   └── 大模型→界面适配器
-├── 质量验证单元
-│   ├── 完整性校验
-│   └── 可信度评分
-├── 异步处理队列
-│   ├── 优先级队列管理
-│   └── 失败任务重试机制
-└── 版本追踪系统
-    ├── 数据血缘分析
-    └── 处理过程溯源
-```
-
-### 3. 大模型服务模块
+### 2. 大模型服务模块
 
 ```
 模型服务
@@ -66,7 +54,7 @@ OCR模块
     └→ 规则知识图谱
 ```
 
-### 4. 用户界面模块
+### 3. 用户界面模块
 
 ```
 交互系统
@@ -84,7 +72,9 @@ OCR模块
     └→ 一键回滚入口
 ```
 
-### 5. 文档智能命名模块（增强版）
+### 4. 文档智能命名模块（增强版）
+
+
 
 ```
 命名系统
@@ -204,35 +194,53 @@ history-doc-helper/
 │   ├── DEV_ARCH.md                # 架构设计文档（含流程图）
 │   └── API_REFERENCE.md           # 模块接口说明
 │
-├── 📁 src/                        # 主代码库
-│   ├── 📁 core/                   # 核心业务逻辑
-│   │   ├── ocr_engine/           # OCR模块
-│   │   │   ├── preprocessor/     # 图像预处理
-│   │   │   ├── model_client/     # 多OCR引擎适配
-│   │   │   └── cache_manager/    # 识别结果缓存系统
+├── 📁 src/                        		# 主代码库
+│   ├── 📁 core/                   		# 核心业务逻辑
+│   │   ├── ocr_engine/           		# OCR模块
+│   │   │   ├── image_processor.py    	# 图像预处理
+│   │   │   ├── text_extractor.py     	# 文字识别核心
+│   │   │   └── data_splitter.py  		# 新增：智能内容分割
 │   │   │
-│   │   ├── data_pipeline/        # 数据流转模块
-│   │   │   ├── format_adapter/   # 数据格式转换
-│   │   │   └── quality_check/    # 数据质量验证
+│   │   ├── ai_service/           		# 大模型模块
+│   │   │   ├── llm_gateway.py        	# 接口核心
+│   │   │   └── context_builder.py 		# 新增：上下文重建
 │   │   │
-│   │   ├── ai_service/           # 大模型模块
-│   │   │   ├── llm_gateway/      # 多模型API网关
-│   │   │   └── post_processor/   # 结果后处理
-│   │   │
-│   │   └── naming_system/        # 智能命名模块
-│   │       ├── rule_engine/      # 动态规则解析
-│   │       └── conflict_solver/  # 命名冲突解决
-│   │
+│   │   └── naming_system/        		# 智能命名模块
+│   │		├── rule_engine.py          # 名称格式化核心（原	rule_name.py）
+│	│		├── file_reader.py          # 原始文档读取（原org_filesname.py）
+│	│		├── backup_manager.py       # 备份与恢复系统（原name_backup.py）
+│	│		├── audit_logger.py         # 新增：操作审计追踪
+│	│		├── sanitizer.py       		# 文件名合法性检查
+│   │ 		└── conflict_handler.py 	# 基础冲突检测
 │   ├── 📁 interface/             # 用户界面
 │   │   ├── gui/                 # 桌面端GUI
-│   │   │   ├── views/           # 界面组件
-│   │   │   └── controllers/     # 控制逻辑
+│   │   │   ├── main_window.py      # 主窗口管理
+│   │   │   ├── components/         # 可重用控件
+│   │   │   │   ├── file_picker.py  # 文件选择组件
+│   │   │   │   └── preview_pane.py # 预览面板组件
+│   │   │   ├── handlers/           # 事件处理
+│   │   │   │   ├── file_ops.py     # 文件操作处理
+│   │   │   │   └── naming_ctrl.py  # 命名控制逻辑
+│   │   │   └── utils/
+│   │   │       └── gui_helpers.py  # GUI专用工具类
 │   │   │
 │   │   ├── webui/               # 网页端
 │   │   │   ├── frontend/        # 前端代码
-│   │   │   └── api/             # RESTful接口
+│   │   │   ├── api/                # 后端接口
+│   │   │   │   ├── ocr_routes.py   # OCR相关接口
+│   │   │   │   ├── naming_routes.py # 命名接口
+│   │   │   │   └── middleware.py   # 请求处理中间件
+│   │   │   ├── service/            # 服务整合
+│   │   │   │   └── async_tasks.py  # 异步任务管理
+│   │   │   └── web_utils/
+│   │   │       └── response.py     # 响应格式化工具
 │   │   │
 │   │   └── cli/                 # 命令行接口
+│   │       ├── process_cmd.py  # 文档处理命令
+│   │       ├── manage_cmd.py   # 系统管理命令
+│   │       ├── formatters.py   # 结果格式化
+│   │       ├── progress.py     # 进度显示
+│   │   	└── arg_parser.py   # 参数解析引擎
 │   │
 │   ├── 📁 infrastructure/        # 基础设施
 │   │   ├── config_manager/      # 配置管理（含默认模板）
@@ -245,9 +253,9 @@ history-doc-helper/
 │       └── assets/              # 静态资源（图标/字体等）
 │
 ├── 📁 tests/                     # 测试体系
-│   ├── unit/                    # 单元测试
-│   ├── integration/             # 集成测试
-│   └── e2e/                     # 端到端测试
+│   ├── test_ocr_engine/
+│   ├── test_ai_service/
+│   └── test_naming_system/
 │
 ├── 📁 configs/                   # 配置中心
 │   ├── app_config.yaml          # 主配置文件
@@ -263,10 +271,6 @@ history-doc-helper/
 │   ├── test_documents/          # 测试用文献样本
 │   └── expected_outputs/        # 预期结果样本
 │
-├── 📁 docs/                      # 项目文档
-│   ├── USER_GUIDE.md            # 图文并茂的用户操作手册
-│   ├── DEV_ARCH.md              # 架构设计文档（含流程图）
-│   └── API_REFERENCE.md         # 模块接口说明
 │
 ├── 📄 .gitignore                # 版本控制排除项
 ├── 📄 requirements.txt          # Python依赖清单
