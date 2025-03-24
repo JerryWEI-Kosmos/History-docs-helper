@@ -1,7 +1,7 @@
 ## 仓库架构
 
 ```
-history-doc-helper/
+history-docs-helper/
 ├── 📁 docs/                        # 项目文档
 │   ├── USER_GUIDE.md              # 图文并茂的用户操作手册
 │   ├── DEV_ARCH.md                # 架构设计文档（含流程图）
